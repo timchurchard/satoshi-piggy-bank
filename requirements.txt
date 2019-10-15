@@ -1,0 +1,6 @@
+pbkdf2==1.3
+pycryptodomex==3.9.0
+git+https://github.com/primal100/pybitcointools
+pyqrcode==1.2.1
+pypng==0.0.20
+requests
