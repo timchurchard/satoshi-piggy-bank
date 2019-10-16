@@ -1,0 +1,4 @@
+- handle empty addresses eg ensure last 20 are empty and return first of them
+- handle button presses EG to show text of address, prev/next address and to shutdown
+- handle other cryptos (litecoin, dash, dogecoin)
+- Write instructions for p2sh wallets as well as legacy p2pk
