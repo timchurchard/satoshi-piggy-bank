@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Waiting for network..."
-HOST="8.8.8.81"
+HOST="8.8.8.8"
 TIMEOUT=30
 tries=1
 while ! ping -c 1 -W 1 $HOST >/dev/null 2>&1 ; do
