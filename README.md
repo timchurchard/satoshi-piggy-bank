@@ -58,7 +58,7 @@ Install updates and required packages.
 ```shell
 sudo apt update
 sudo apt upgrade
-sudo apt install python3-venv git vim htop
+sudo apt install python3-venv python3-pip git vim htop
 ```
 
 Install the PaPiRus driver.  See [PaPiRus github](https://github.com/PiSupply/PaPiRus).
@@ -74,6 +74,17 @@ papirus-test
 Clone the satoshi-piggy-bank repo.
 ```shell
 git clone https://github.com/timchurchard/satoshi-piggy-bank.git
+```
+
+Install the python3 dependencies
+```
+sudo pip3 install -U pip setuptools
+sudo pip3 install -r satoshi-piggy-bank/requirements.txt
+```
+
+Test run the satoshi-piggy-bank
+```
+python3 satoshi-piggy-bank/code/piggy-bank.py
 ```
 
 Edit the /etc/rc.local file to run the scripts on boot.
