@@ -10,7 +10,8 @@ import pyqrcode
 
 
 # Put your xpub here for Bitcoin, Litecoin, Dogecoin or Dash
-XPUB = "xpub6CPkcptFb3VQudKr4FytZfY1GumgV29pUjBqYyx2GPpX5qirZULBg5U7ynEFHriZU5LXvdoMGQWPMK8LBAeR35f32FQNEAZHG8mNsS3oFwJ"
+# XPUB = "xpub6CPkcptFb3VQudKr4FytZfY1GumgV29pUjBqYyx2GPpX5qirZULBg5U7ynEFHriZU5LXvdoMGQWPMK8LBAeR35f32FQNEAZHG8mNsS3oFwJ"
+XPUB = "ypub6X9tfM9t5GxhZwZWdAepwURh3X6JYfwbi8JtpCQB1eQGbjzyXpagoqZRxsjowgzqUhdVpoZwyrEMXUxZvYxYxuYNSyrvpKVZNjjR8YfB4Gd"
 # XPUB = "Ltub2YvKWEvSpbSoNtSCwQULZLs9Ct7Q7yDoQ21mkUkCLtFuKAj9DfBCkRiC6mpp8hGjmAY16soeDgEdHmRa2UQRpnnLXdQk4oTfNVXGtTVtsn7"
 # XPUB = "dgub8rEUCjTRge3oCcY2joYqnG7UwZsrtcxKVat1KYct3Kkhcjys5XBfhGWsZ2xkuB4qbgSDxR21puUtDyrkJqC3EuqrvNM7C48jE3i4xnfEsE3"
 # XPUB = "drkpRyUaAg9YzaY3CZCWQ7biN5hxoNsRxHB72SUBh7vKQT8eezg8d8RoXpHfzaZx1jRmC9ZQizJXrDq2V5dXny3NHLk5523mJWGScGNpu4L4Fyx"
@@ -21,8 +22,12 @@ DEPTH = 10
 
 # Computed Settings
 COIN = Bitcoin
-P2SH = False  # todo
+P2SH = False
 TOTAL_BALANCE_FMT = "{:.8f}"
+PRICE_FMT = "{:.2f}"
+
+if XPUB.startswith("ypub"):
+    P2SH = True
 
 if XPUB.startswith("Ltub"):
     COIN = Litecoin
@@ -33,6 +38,7 @@ if XPUB.startswith("Mtub"):
 if XPUB.startswith("dgub"):
     COIN = dogecoin.Doge
     TOTAL_BALANCE_FMT = "{:.2f}"
+    PRICE_FMT = "{:.5f}"
 
 if XPUB.startswith("drkp"):
     COIN = Dash
@@ -138,8 +144,8 @@ def main():
     value = price * total_balance
 
     # Prepare output
-    price = "{:.2f}".format(price)
-    value = "{:.2f}".format(value)
+    price = PRICE_FMT.format(price)
+    value = PRICE_FMT.format(value)
     total_balance = TOTAL_BALANCE_FMT.format(total_balance)
 
     qr = pyqrcode.create(first_unused_addr)
