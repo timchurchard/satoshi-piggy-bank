@@ -112,6 +112,6 @@ if [ "$_IP" ]; then
   printf "My IP address is %s\n" "$_IP"
 fi
 
-# Run the satoshi-piggy-bank
-python3 /home/pi/satoshi-piggy-bank/code/piggy-bank.py
+# Run the satoshi-piggy-bank as pi user
+su pi -c "python3 /home/pi/satoshi-piggy-bank/code/piggy-bank.py"
 ```
