@@ -11,10 +11,10 @@ import pyqrcode
 
 # Put your xpub here for Bitcoin, Litecoin, Dogecoin or Dash
 # XPUB = "xpub6CPkcptFb3VQudKr4FytZfY1GumgV29pUjBqYyx2GPpX5qirZULBg5U7ynEFHriZU5LXvdoMGQWPMK8LBAeR35f32FQNEAZHG8mNsS3oFwJ"
-XPUB = "ypub6X9tfM9t5GxhZwZWdAepwURh3X6JYfwbi8JtpCQB1eQGbjzyXpagoqZRxsjowgzqUhdVpoZwyrEMXUxZvYxYxuYNSyrvpKVZNjjR8YfB4Gd"
+# XPUB = "ypub6X9tfM9t5GxhZwZWdAepwURh3X6JYfwbi8JtpCQB1eQGbjzyXpagoqZRxsjowgzqUhdVpoZwyrEMXUxZvYxYxuYNSyrvpKVZNjjR8YfB4Gd"
 # XPUB = "Ltub2YvKWEvSpbSoNtSCwQULZLs9Ct7Q7yDoQ21mkUkCLtFuKAj9DfBCkRiC6mpp8hGjmAY16soeDgEdHmRa2UQRpnnLXdQk4oTfNVXGtTVtsn7"
 # XPUB = "dgub8rEUCjTRge3oCcY2joYqnG7UwZsrtcxKVat1KYct3Kkhcjys5XBfhGWsZ2xkuB4qbgSDxR21puUtDyrkJqC3EuqrvNM7C48jE3i4xnfEsE3"
-# XPUB = "drkpRyUaAg9YzaY3CZCWQ7biN5hxoNsRxHB72SUBh7vKQT8eezg8d8RoXpHfzaZx1jRmC9ZQizJXrDq2V5dXny3NHLk5523mJWGScGNpu4L4Fyx"
+XPUB = "drkpRyUaAg9YzaY3GnRLKiTGydm5rhbsu6iWhr89QMoV8hsPuA91AHAkm1piRgmN34bkJqriScvSMVeuNSbHDSW2X7fiYxfuHfztPCV14LX2W3V"
 
 # User Settings
 # - How many empty addresses to check
@@ -38,7 +38,7 @@ if XPUB.startswith("Mtub"):
 if XPUB.startswith("dgub"):
     COIN = dogecoin.Doge
     TOTAL_BALANCE_FMT = "{:.2f}"
-    PRICE_FMT = "{:.5f}"
+    PRICE_FMT = "{:.4f}"
 
 if XPUB.startswith("drkp"):
     COIN = Dash
@@ -117,6 +117,30 @@ def generate_addr(n=0):
     return addr
 
 
+def draw_home_screen(first_unused_addr, total_balance=None, price=None, value=None):
+    qr = pyqrcode.create(first_unused_addr)
+    qr.png('/tmp/addr.png', scale=5)
+
+    # Render to screen
+    # Note: The screen I have is 2" 200x96 px.  Lots of hardcoded numbers follow.
+    coin = COIN()
+    comp = PapirusComposite(False)
+    comp.AddImg("/tmp/addr.png", -10, -10, (96, 96), Id="Addr")
+
+    if total_balance is None:
+        comp.AddText("Offline", 10, 77, Id="total")
+    else:
+        comp.AddText("{} {}".format(total_balance, coin.coin_symbol), 10, 77, Id="total")
+
+    comp.AddText("{}".format(coin.display_name), 90, 10, Id="title")
+
+    if price is not None:
+        comp.AddText("${}".format(value), 90, 30, Id="value")
+        comp.AddText("${}".format(price), 90, 50, Id="price")
+
+    comp.WriteAll()
+
+
 def main():
     # Calculate total balance and find last unused address
     total_balance = 0.0
@@ -126,6 +150,11 @@ def main():
     while True:
         addr = generate_addr(n)
         balance, used = check_balance(addr)
+        if balance is None:
+            # Note: Assume no internet so exit loop
+            print("Running in offline mode. Addr {}".format(addr))
+            first_unused_addr = addr
+            break
         total_balance += balance
         print("Found n={} {} with balance {:.8f}".format(n, addr, balance))
         if not used:
@@ -141,34 +170,24 @@ def main():
 
     # Lookup fiat value of bitcoin
     price = check_fiat_price_usd()
-    value = price * total_balance
 
-    # Prepare output
-    price = PRICE_FMT.format(price)
-    value = PRICE_FMT.format(value)
-    total_balance = TOTAL_BALANCE_FMT.format(total_balance)
+    if price is None:
+        draw_home_screen(first_unused_addr)
 
-    qr = pyqrcode.create(first_unused_addr)
-    qr.png('/tmp/addr.png', scale=5)
+    else:
+        # Prepare output
+        value = price * total_balance
+        price = PRICE_FMT.format(price)
+        value = PRICE_FMT.format(value)
+        total_balance = TOTAL_BALANCE_FMT.format(total_balance)
 
-    # Render to screen
-    # Note: The screen I have is 2" 200x96 px.  Lots of hardcoded numbers follow.
-    coin = COIN()
-    comp = PapirusComposite(False)
-    comp.AddImg("/tmp/addr.png", -10, -10, (96, 96), Id="Addr")
+        # Draw home screen
+        draw_home_screen(first_unused_addr, total_balance, price, value)
 
-    comp.AddText("{} {}".format(total_balance, coin.coin_symbol), 10, 77, Id="total")
-
-    comp.AddText("{}".format(coin.display_name), 90, 10, Id="title")
-    comp.AddText("${}".format(value), 90, 30, Id="value")
-    comp.AddText("${}".format(price), 90, 50, Id="price")
-
-    comp.WriteAll()
-
-    # Print infos
-    print("Fiat price USD: ", price)
-    print("Fiat value USD: ", value)
-    print("total_balance: ", total_balance, coin.coin_symbol)
+        # Print infos
+        print("Fiat price USD: ", price)
+        print("Fiat value USD: ", value)
+        print("total_balance: ", total_balance)
 
 
 if __name__ == '__main__':
