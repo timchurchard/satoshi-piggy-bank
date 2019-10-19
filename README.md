@@ -115,5 +115,7 @@ if [ "$_IP" ]; then
 fi
 
 # Run the satoshi-piggy-bank as pi user
-su pi -c "python3 /home/pi/satoshi-piggy-bank/code/piggy-bank.py"
+export PYTHONPATH=/home/pi/satoshi-piggy-bank/code
+su pi -c "python3 -m piggy-bank.py"
+# Add your own --xpub xpubXXYY...
 ```

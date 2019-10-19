@@ -1,0 +1,11 @@
+
+Unreleased
+
+- Refactored into a module
+- Added basic button handling and gui
+- Added single address mode
+- Added static test script
+
+0.1: First version good enough
+
+- Single script version.  Might be useful to someone in this format.
