@@ -6,9 +6,9 @@ from cryptos import Bitcoin, Litecoin, Dash, dogecoin
 from .const import BTC, LTC, DOGE, DASH
 
 
-class Coin:
+class Coin:  # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, xpub):
+    def __init__(self, xpub=None, single=None):
         self._coin = Bitcoin
         self.__balance_fmt = "{:.8f}"
         self.__price_fmt = "{:.2f}"
@@ -16,22 +16,40 @@ class Coin:
         self.__p2sh = False
         self.__xpub = xpub
 
-        if xpub.startswith("ypub"):
-            self.__p2sh = True
+        self.__single = single
+        if self.__single is not None:
+            # single address mode
+            if self.__single[0] in ['1', '3', 'b']:
+                # Bitcoin
+                pass
+            elif self.__single[0] in ['L', 'M']:
+                # Litecoin
+                self._coin = Litecoin
+            elif self.__single[0] == 'D':
+                # Dogecoin
+                self._coin = dogecoin.Doge
+                self.__balance_fmt = "{:.2f}"
+                self.__price_fmt = "{:.4f}"
+            elif self.__single[0] == 'X':
+                self._coin = Dash
+        else:
+            # xpub mode
+            if xpub.startswith("ypub"):
+                self.__p2sh = True
 
-        if xpub.startswith("Ltub"):
-            self._coin = Litecoin
+            if xpub.startswith("Ltub"):
+                self._coin = Litecoin
 
-        if xpub.startswith("Mtub"):
-            raise NotImplementedError("pybitcointools does not support P2SH for Litecoin.")
+            if xpub.startswith("Mtub"):
+                raise NotImplementedError("pybitcointools does not support P2SH for Litecoin.")
 
-        if xpub.startswith("dgub"):
-            self._coin = dogecoin.Doge
-            self.__balance_fmt = "{:.2f}"
-            self.__price_fmt = "{:.4f}"
+            if xpub.startswith("dgub"):
+                self._coin = dogecoin.Doge
+                self.__balance_fmt = "{:.2f}"
+                self.__price_fmt = "{:.4f}"
 
-        if xpub.startswith("drkp"):
-            self._coin = Dash
+            if xpub.startswith("drkp"):
+                self._coin = Dash
 
         self.__coin_inst = self._coin()
         self.__coin = self.__coin_inst.coin_symbol
@@ -49,7 +67,9 @@ class Coin:
         return self.__balance_fmt
 
     def generate_addr(self, num=0):
-        """Generate an address"""
+        """Generate an address or return single address"""
+        if self.__single is not None:
+            return self.__single
         if self.__p2sh:
             wallet = self.__coin_inst.watch_p2wpkh_p2sh_wallet(self.__xpub)
         else:

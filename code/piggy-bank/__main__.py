@@ -39,6 +39,11 @@ def get_total_balance(depth, coin):
         n = n + 1
         if remaining == 0:
             break
+
+        if n == 1 and addr == coin.generate_addr(n):
+            # Single mode!
+            first_unused_addr = addr
+            break
     return total_balance, first_unused_addr
 
 
@@ -46,12 +51,15 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--depth", help="how many addresses to check after the first unused address", default=DEFAULT_DEPTH)
     parser.add_argument("--xpub", help="xpub of watch only wallet in Bitcoin, Litecoin, Dogecoin or Dash")
+    parser.add_argument("--single", help="single address to watch")
     args = parser.parse_args()
 
-    if args.xpub is None:
-        print("WARN: --xpub not specified.  Will use example xpub!")
+    xpub = None
+    if args.xpub is None and args.single is None:
+        print("WARN: --xpub or --single not specified.  Will use example xpub!")
+        xpub = random_choice(EXAMPLE_XPUBS)
 
-    coin = Coin(args.xpub if args.xpub else random_choice(EXAMPLE_XPUBS))
+    coin = Coin(xpub=xpub, single=args.single)
     fiat = Fiat(coin.coin_symbol)
     draw = Draw(coin.coin_symbol)
 
