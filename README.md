@@ -117,5 +117,18 @@ fi
 # Run the satoshi-piggy-bank as pi user
 export PYTHONPATH=/home/pi/satoshi-piggy-bank/code
 su pi -c "python3 -m piggy-bank.py"
-# Add your own --xpub xpubXXYY...
+```
+
+Command options.  Add your own xpub or single address to watch.  By default the script will run and exit.  There is an optional gui mode that watches for button presses, it can show the text of the address and update the total balance and shutdown the raspberry pi.
+```shell
+usage: __main__.py [-h] [--depth DEPTH] [--xpub XPUB] [--single SINGLE]
+                   [--gui]
+
+optional arguments:
+  -h, --help       show this help message and exit
+  --depth DEPTH    how many addresses to check after the first unused address
+  --xpub XPUB      xpub of watch only wallet in Bitcoin, Litecoin, Dogecoin or
+                   Dash
+  --single SINGLE  single address to watch
+  --gui            Continue running in GUI mode (papirus only)
 ```
