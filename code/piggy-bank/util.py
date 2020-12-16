@@ -1,4 +1,4 @@
-
+# (C) 2020 Tim Churchard
 
 def get_total_balance(depth, coin):
     # Calculate total balance and find last unused address
@@ -36,9 +36,9 @@ def get_total_balance(depth, coin):
     return total_balance, first_unused_addr
 
 
-def format_total_price(coin, total_balance, price):
+def format_total_price(coin, total_balance, price, currency_symbol):
     value = price * total_balance
-    price = coin.price_fmt.format(price)
-    value = coin.price_fmt.format(value)
+    price = currency_symbol + coin.price_fmt.format(price)
+    value = currency_symbol + coin.price_fmt.format(value)
     total_balance = coin.balance_fmt.format(total_balance)
     return total_balance, price, value

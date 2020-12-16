@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# (C) 2019 Tim Churchard
+# (C) 2020 Tim Churchard
 
 from sys import exit as sysexit
 
@@ -9,7 +9,7 @@ from random import choice as random_choice
 from .fiat import Fiat
 from .coin import Coin
 from .draw import Draw
-from .const import DEFAULT_DEPTH, EXAMPLE_XPUBS
+from .const import DEFAULT_DEPTH, EXAMPLE_XPUBS, DEFAULT_FIAT
 from .util import get_total_balance, format_total_price
 
 
@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--xpub', help='xpub of watch only wallet in Bitcoin, Litecoin, Dogecoin or Dash')
     parser.add_argument('--single', help='single address to watch')
     parser.add_argument('--gui', help='Continue running in GUI mode (papirus only)', action='store_true')
+    parser.add_argument('--currency', help='currency (GBP,USD,EUR)', default=DEFAULT_FIAT)
     args = parser.parse_args()
 
     xpub = None
@@ -29,25 +30,25 @@ def main():
         xpub = args.xpub
 
     coin = Coin(xpub=xpub, single=args.single)
-    fiat = Fiat(coin.coin_symbol)
-    draw = Draw(coin.coin_symbol, gui=args.gui)
+    fiat = Fiat(coin.coin_symbol, currency=args.currency)
+    draw = Draw(coin.coin_symbol, gui=args.gui, fiat=fiat)
 
     total_balance, first_unused_addr = get_total_balance(args.depth, coin)
 
     # Lookup fiat value of bitcoin
-    price = fiat.check_price_usd()
+    price = fiat.check_price()
 
     if price is None:
         draw.draw_home_screen(first_unused_addr)
 
     else:
-        total_balance, price, value = format_total_price(coin, total_balance, price)
+        total_balance, price, value = format_total_price(coin, total_balance, price, fiat.current_symbol)
 
         draw.draw_home_screen(first_unused_addr, total_balance, price, value)
 
         # Print infos
-        print('Fiat price USD: ', price)
-        print('Fiat value USD: ', value)
+        print('Fiat price: ', price)
+        print('Fiat value: ', value)
         print('total_balance: ', total_balance)
 
     # Run the GUI loop until user hits shutdown!

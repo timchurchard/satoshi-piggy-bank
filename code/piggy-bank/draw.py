@@ -41,13 +41,14 @@ class Draw:
     # Render to screen
     # Note: The screen I have is 2' 200x96 px.  Lots of hardcoded numbers follow.
 
-    def __init__(self, coin, gui=False):
+    def __init__(self, coin, gui=False, fiat=None):
         if coin in SUPPORTED_COINS:
             self.__coin = coin
         else:
             raise ValueError('Fiat unsupported coin {}'.format(coin))
 
         self.__gui = gui
+        self.__fiat = fiat
 
     def draw_home_screen(self, first_unused_addr, total_balance=None, price=None, value=None, gfx=None):
         if papirus is None:
@@ -68,8 +69,8 @@ class Draw:
         comp.AddText('{}'.format(COIN_NAMES[self.__coin]), 90, 10, Id='title')
 
         if price is not None:
-            comp.AddText('${}'.format(value), 90, 30, Id='value')
-            comp.AddText('${}'.format(price), 90, 50, Id='price')
+            comp.AddText('{}'.format(value), 90, 30, Id='value')
+            comp.AddText('{}'.format(price), 90, 50, Id='price')
 
         if self.__gui and papirus:
             if gfx == MENU_TOP:
@@ -151,8 +152,8 @@ class Draw:
                 if bpress == 3:
                     # Update balance
                     total_balance, first_unused_addr = get_total_balance(depth, coin)
-                    price = fiat.check_price_usd()
-                    total_balance, price, value = format_total_price(coin, total_balance, price)
+                    price = fiat.check_price()
+                    total_balance, price, value = format_total_price(coin, total_balance, price, self.__fiat.current_symbol)
 
             if screen == 1:
                 # Shutdown

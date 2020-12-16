@@ -1,3 +1,4 @@
+# (C) 2020 Tim Churchard
 
 import requests
 
@@ -90,11 +91,11 @@ class Coin:  # pylint: disable=too-many-instance-attributes
 
     @classmethod
     def __check_balance_btc(cls, addr):
-        URL = 'https://blockchain.info/balance?active={}'
+        URL = f'https://blockchain.info/balance?active={addr}'
         balance = None
         used = False
         try:
-            resp = requests.get(URL.format(addr))
+            resp = requests.get(URL)
             if resp.status_code == 200:
                 data = resp.json()
                 balance = data[addr]['final_balance'] / 100000000
@@ -102,6 +103,15 @@ class Coin:  # pylint: disable=too-many-instance-attributes
         except:
             # fixme: Not ideal just swallow all errors and return balance=None on any error
             pass
+
+        if balance is None:
+            URL = f'https://api.blockchair.com/bitcoin/dashboards/address/{addr}'
+            resp = requests.get(URL)
+            if resp.status_code == 200:
+                data = resp.json()['data']
+                balance = data[addr]['address']['balance'] / 100000000
+                used = data[addr]['address']['received'] > 0
+
         return balance, used
 
     def __check_balance_ltc(self, addr):
