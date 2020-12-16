@@ -10,8 +10,8 @@ class Coin:  # pylint: disable=too-many-instance-attributes
 
     def __init__(self, xpub=None, single=None):
         self._coin = Bitcoin
-        self.__balance_fmt = "{:.8f}"
-        self.__price_fmt = "{:.2f}"
+        self.__balance_fmt = '{:.8f}'
+        self.__price_fmt = '{:.2f}'
 
         self.__p2sh = False
         self.__xpub = xpub
@@ -28,27 +28,27 @@ class Coin:  # pylint: disable=too-many-instance-attributes
             elif self.__single[0] == 'D':
                 # Dogecoin
                 self._coin = dogecoin.Doge
-                self.__balance_fmt = "{:.2f}"
-                self.__price_fmt = "{:.4f}"
+                self.__balance_fmt = '{:.2f}'
+                self.__price_fmt = '{:.4f}'
             elif self.__single[0] == 'X':
                 self._coin = Dash
         else:
             # xpub mode
-            if xpub.startswith("ypub"):
+            if xpub.startswith('ypub'):
                 self.__p2sh = True
 
-            if xpub.startswith("Ltub"):
+            if xpub.startswith('Ltub'):
                 self._coin = Litecoin
 
-            if xpub.startswith("Mtub"):
-                raise NotImplementedError("pybitcointools does not support P2SH for Litecoin.")
+            if xpub.startswith('Mtub'):
+                raise NotImplementedError('pybitcointools does not support P2SH for Litecoin.')
 
-            if xpub.startswith("dgub"):
+            if xpub.startswith('dgub'):
                 self._coin = dogecoin.Doge
-                self.__balance_fmt = "{:.2f}"
-                self.__price_fmt = "{:.4f}"
+                self.__balance_fmt = '{:.2f}'
+                self.__price_fmt = '{:.4f}'
 
-            if xpub.startswith("drkp"):
+            if xpub.startswith('drkp'):
                 self._coin = Dash
 
         self.__coin_inst = self._coin()
@@ -75,7 +75,7 @@ class Coin:  # pylint: disable=too-many-instance-attributes
         else:
             wallet = self.__coin_inst.watch_wallet(self.__xpub)
         if not wallet.is_watching_only:
-            raise ValueError("Wallet is not watch only!  Please use xpub for safety.")
+            raise ValueError('Wallet is not watch only!  Please use xpub for safety.')
         addr = wallet.receiving_address(num)
         return addr
 
@@ -90,7 +90,7 @@ class Coin:  # pylint: disable=too-many-instance-attributes
 
     @classmethod
     def __check_balance_btc(cls, addr):
-        URL = "https://blockchain.info/balance?active={}"
+        URL = 'https://blockchain.info/balance?active={}'
         balance = None
         used = False
         try:
@@ -108,11 +108,11 @@ class Coin:  # pylint: disable=too-many-instance-attributes
         balance = None
         used = False
         if self.__coin == LTC:
-            BALANCE_URL = "http://explorer.litecoin.net/chain/Litecoin/q/addressbalance/{}"
-            RECEIVED_URL = "http://explorer.litecoin.net/chain/Litecoin/q/getreceivedbyaddress/{}"
+            BALANCE_URL = 'http://explorer.litecoin.net/chain/Litecoin/q/addressbalance/{}'
+            RECEIVED_URL = 'http://explorer.litecoin.net/chain/Litecoin/q/getreceivedbyaddress/{}'
         else:
-            BALANCE_URL = "https://dogechain.info/chain/Dogecoin/q/addressbalance/{}"
-            RECEIVED_URL = "http://dogechain.info/chain/Dogecoin/q/getreceivedbyaddress/{}"
+            BALANCE_URL = 'https://dogechain.info/chain/Dogecoin/q/addressbalance/{}'
+            RECEIVED_URL = 'http://dogechain.info/chain/Dogecoin/q/getreceivedbyaddress/{}'
         try:
             resp = requests.get(BALANCE_URL.format(addr))
             if resp.status_code == 200:
@@ -127,15 +127,15 @@ class Coin:  # pylint: disable=too-many-instance-attributes
 
     @classmethod
     def __check_balance_dash(cls, addr):
-        URL = "https://insight.dash.org/insight-api/addr/{}/?noTxList=1"
+        URL = 'https://insight.dash.org/insight-api/addr/{}/?noTxList=1'
         balance = None
         used = False
         try:
             resp = requests.get(URL.format(addr))
             if resp.status_code == 200:
                 data = resp.json()
-                balance = float(data["balance"])
-                used = data["totalReceivedSat"] > 0
+                balance = float(data['balance'])
+                used = data['totalReceivedSat'] > 0
         except:
             # fixme
             pass

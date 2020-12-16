@@ -11,7 +11,7 @@ try:
     from papirus import PapirusComposite
     papirus = True
 except ImportError:
-    print("WARN: Failed to import papirus.  Will fake it.")
+    print('WARN: Failed to import papirus.  Will fake it.')
     papirus = None
 
 try:
@@ -39,57 +39,57 @@ MENU_OFF = os.path.join(GFX_PATH, 'shutdown.png')
 
 class Draw:
     # Render to screen
-    # Note: The screen I have is 2" 200x96 px.  Lots of hardcoded numbers follow.
+    # Note: The screen I have is 2' 200x96 px.  Lots of hardcoded numbers follow.
 
     def __init__(self, coin, gui=False):
         if coin in SUPPORTED_COINS:
             self.__coin = coin
         else:
-            raise ValueError("Fiat unsupported coin {}".format(coin))
+            raise ValueError('Fiat unsupported coin {}'.format(coin))
 
         self.__gui = gui
 
     def draw_home_screen(self, first_unused_addr, total_balance=None, price=None, value=None, gfx=None):
         if papirus is None:
-            print("Fake: ", self.__coin, first_unused_addr, total_balance, price, value)
+            print('Fake: ', self.__coin, first_unused_addr, total_balance, price, value)
             return
 
         qr = pyqrcode.create(first_unused_addr)
         qr.png('/tmp/addr.png', scale=5)
 
         comp = PapirusComposite(False)
-        comp.AddImg("/tmp/addr.png", -10, -10, (96, 96), Id="addr")
+        comp.AddImg('/tmp/addr.png', -10, -10, (96, 96), Id='addr')
 
         if total_balance is None:
-            comp.AddText("Offline", 10, 77, Id="total")
+            comp.AddText('Offline', 10, 77, Id='total')
         else:
-            comp.AddText("{} {}".format(total_balance, self.__coin), 10, 77, Id="total")
+            comp.AddText('{} {}'.format(total_balance, self.__coin), 10, 77, Id='total')
 
-        comp.AddText("{}".format(COIN_NAMES[self.__coin]), 90, 10, Id="title")
+        comp.AddText('{}'.format(COIN_NAMES[self.__coin]), 90, 10, Id='title')
 
         if price is not None:
-            comp.AddText("${}".format(value), 90, 30, Id="value")
-            comp.AddText("${}".format(price), 90, 50, Id="price")
+            comp.AddText('${}'.format(value), 90, 30, Id='value')
+            comp.AddText('${}'.format(price), 90, 50, Id='price')
 
         if self.__gui and papirus:
             if gfx == MENU_TOP:
-                comp.AddImg(MENU_TOP, 0, 0, (200, 14), Id="menu")
+                comp.AddImg(MENU_TOP, 0, 0, (200, 14), Id='menu')
             else:
                 # Show the menu icon top right
-                comp.AddImg(MENU_ICON, 160, 0, (40, 14), Id="menu")
+                comp.AddImg(MENU_ICON, 160, 0, (40, 14), Id='menu')
 
         comp.WriteAll()
 
     @classmethod
     def draw_shutdown_option(cls):
         comp = PapirusComposite(False)
-        comp.AddImg(MENU_OFF, 0, 0, (200, 96), Id="off")
+        comp.AddImg(MENU_OFF, 0, 0, (200, 96), Id='off')
         comp.WriteAll()
 
     @classmethod
     def draw_address(cls, addr):
         comp = PapirusComposite(False)
-        comp.AddText(addr, 10, 30, (180, 66), Id="addr")
+        comp.AddText(addr, 10, 30, (180, 66), Id='addr')
         comp.WriteAll()
 
     @classmethod
@@ -109,7 +109,7 @@ class Draw:
             while True:
                 # Exit when SW1 and SW2 are pressed simultaneously
                 if (GPIO.input(SW1) == False) and (GPIO.input(SW2) == False):  # noqa
-                    print("Exiting... ")
+                    print('Exiting... ')
                     return 0
 
                 for b in BUTTONS:
@@ -130,7 +130,7 @@ class Draw:
         screen = 0
         menu_shown = False
         while True:
-            print("Running GUI main loop...")
+            print('Running GUI main loop...')
             bpress = self.__wait_for_button()
             if screen == 0:
                 # Homescreen QR code and balance
@@ -160,7 +160,7 @@ class Draw:
                     self.__gui = False
                     self.draw_home_screen(first_unused_addr, total_balance, price, value, gfx=MENU_TOP if not menu_shown else MENU_ICON)
                     sleep(0.25)
-                    system("sudo halt")
+                    system('sudo halt')
                 else:
                     self.draw_home_screen(first_unused_addr, total_balance, price, value, gfx=MENU_TOP if not menu_shown else MENU_ICON)
                     menu_shown = False

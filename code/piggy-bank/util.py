@@ -13,15 +13,15 @@ def get_total_balance(depth, coin):
         balance, used = coin.check_balance(addr)
         if balance is None:
             # Note: Assume no internet so exit loop
-            print("Running in offline mode. Addr {}".format(addr))
+            print('Running in offline mode. Addr {}'.format(addr))
             first_unused_addr = addr
             break
         total_balance += balance
-        print("Found n={} {} with balance {:.8f}".format(n, addr, balance))
+        print('Found n={} {} with balance {:.8f}'.format(n, addr, balance))
         if not used:
             if first_unused_addr is None:
                 first_unused_addr = addr
-                print(" ^ First unused address")
+                print(' ^ First unused address')
             remaining = remaining - 1
         else:
             remaining = depth
